@@ -2,6 +2,13 @@
 
 Questions / Bug Reports / Pull Requests welcome!  https://github.com/billroy/bitlash/issues
 
+## March 2025: ESP32 Serial Decoupling
+
+- Decoupled Bitlash's serial handling for ESP32, making the library serial-agnostic. Bitlash no longer automatically reads from or writes to the hardware `Serial` port, freeing it for application-specific use.
+- Use `doCommand()` to pass commands programmatically and `setOutputHandler()` to capture output via a custom callback.
+- Added a corresponding example sketch demonstrating custom serial management with the new API.
+- Removed obsolete files left over from prior ESP32 migration work.
+
 ## March 19, 2013: Type checking for string arguments
 
 Bitlash supports string constants in function argument lists, but until now there hasn't been a way to distinguish such string arguments from numeric arguments once you're inside the called function, making it easy to reference forbidden memory by mistake.
