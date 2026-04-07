@@ -113,7 +113,7 @@
 #define ARDUINO_VERSION 16		// working, released
 
 // the serial support, she is changing all the time
-#if ARDUINO_VERSION >= 15
+#if ARDUINO_VERSION >= 15 && !defined(ESP32)
 #define beginSerial Serial.begin
 #define serialAvailable Serial.available
 #define serialRead Serial.read
@@ -459,6 +459,19 @@ extern void oops(int errcode);
 #include <HardwareSerial.h>
 #include <EEPROM.h>
 
+// ESP32: Bitlash has no serial involvement.
+// Use doCommand() to feed commands and setOutputHandler() to capture output.
+static inline void   _bl_noop_begin(unsigned long b) { (void)b; }
+static inline int    _bl_noop_available()             { return 0; }
+static inline int    _bl_noop_read()                  { return -1; }
+static inline size_t _bl_noop_write(uint8_t c)        { (void)c; return 0; }
+
+#define beginSerial     _bl_noop_begin
+#define serialAvailable _bl_noop_available
+#define serialRead      _bl_noop_read
+#define serialWrite     _bl_noop_write
+
+
 extern void displayBanner(void);
 extern void initlbuf(void);
 extern void pointToError(void);
@@ -475,7 +488,11 @@ extern void oops(int errcode);
 
 #define NUMPINS 39   
 
-#define E2END SPI_FLASH_SEC_SIZE - 1   // 4096
+#ifndef SPI_FLASH_SEC_SIZE
+#define SPI_FLASH_SEC_SIZE 4096
+#endif
+#define E2END (SPI_FLASH_SEC_SIZE - 1)
+
 extern void eeinit(void);
 extern void eewrite(int addr, uint8_t value);
 extern uint8_t eeread(int addr);
